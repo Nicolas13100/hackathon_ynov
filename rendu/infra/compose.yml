@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: remigeslin/socket-chat:v2
+    image: remigeslin/socket-chat:latest
     container_name: techcorp_frontend
     ports:
       - "3000:3000"
