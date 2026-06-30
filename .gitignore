@@ -40,4 +40,5 @@ Thumbs.db
 # --- Logs / data volumineuse non versionnée ---
 logs/*.log
 ollama_data/
-*.zip
+*.ziprendu/socket-chat/.env.example
+rendu/socket-chat/.env.local.example
