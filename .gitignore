@@ -34,7 +34,6 @@ venv/
 # --- Editeurs / OS ---
 .vscode/
 .idea/
-.DS_Store
 Thumbs.db
 
 # --- Logs / data volumineuse non versionnée ---
