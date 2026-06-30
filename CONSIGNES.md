@@ -19,6 +19,7 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 
 - [x] Tester le modèle en production : 10+ questions, noter les réponses
 - [x] Évaluer : le modèle est-il fiable ? Déployable en l'état ?
+- [x] **Bonus** : Fine-tuner le modèle existant
 - [x] Fine-tuner un modèle médical sur Colab (voir `medical_project/Readme.md`)
 - [ ] Partager le lien Colab + métriques d'entraînement (loss, epochs) : ne sera pas fait avec Colab, explication dans `rendu/README.md`
 
@@ -35,10 +36,10 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 
 ## 🔒 CYBER
 
-- [ ] Auditer tout ce que l'équipe précédente a laissé (code, logs, données)
-- [ ] Identifier les problèmes de sécurité, évaluer leur criticité
-- [ ] Tester la robustesse du modèle (prompt injection, données sensibles...)
-- [ ] Rédiger un rapport : findings + preuves + recommandations
+- [x] Auditer tout ce que l'équipe précédente a laissé (code, logs, données)
+- [x] Identifier les problèmes de sécurité, évaluer leur criticité
+- [x] Tester la robustesse du modèle (prompt injection, données sensibles...)
+- [x] Rédiger un rapport : findings + preuves + recommandations
 
 ---
 
