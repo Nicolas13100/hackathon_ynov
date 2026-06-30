@@ -29,7 +29,10 @@ docker run --rm -v "$(pwd)/../../models:/models" -w /models python:3.11 bash -c 
 
 # 3. Process Medical Model (Merge -> GGUF), fully inside Docker (no host Python needed)
 echo "🧠 [Medical] Merging base model and LoRA adapter, then converting to GGUF..."
-docker run --rm -v "$(pwd)/..:/workspace" -w /workspace/infra python:3.11 bash -c "
+docker run --rm \
+  -v "$(pwd)/..:/workspace" \
+  -v "$(pwd)/../../models:/models_out" \
+  -w /workspace/infra python:3.11 bash -c "
   echo '📦 [Medical] Installation des dépendances Python (peut prendre quelques minutes)...' &&
   pip install 'transformers==4.46.3' 'trl==0.12.1' 'peft==0.13.2' 'accelerate==1.1.1' 'datasets==3.1.0' &&
   echo '🔀 [Medical] Fusion du modèle de base et de l'\''adaptateur LoRA...' &&
@@ -41,8 +44,9 @@ docker run --rm -v "$(pwd)/..:/workspace" -w /workspace/infra python:3.11 bash -
   echo '📥 Téléchargement du tokenizer.model manquant...' &&
   curl -sL https://huggingface.co/microsoft/Phi-3.5-mini-instruct/resolve/main/tokenizer.model -o medical_model_merged/tokenizer.model &&
   echo '🔧 [Medical] Conversion en GGUF...' &&
-  python llama.cpp/convert_hf_to_gguf.py medical_model_merged --outfile medical-model-f16.gguf --outtype f16 &&
-  echo '✅ [Medical] Conversion GGUF terminée : medical-model-f16.gguf'
+  mkdir -p /models_out/phi3_medical &&
+  python llama.cpp/convert_hf_to_gguf.py medical_model_merged --outfile /models_out/phi3_medical/medical-model-f16.gguf --outtype f16 &&
+  echo '✅ [Medical] Conversion GGUF terminée : models/phi3_medical/medical-model-f16.gguf'
 "
 
 # 4. Start the Ollama server and Frontend via Docker Compose
