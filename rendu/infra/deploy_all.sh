@@ -22,7 +22,18 @@ docker run --rm -v "$(pwd)/../../models:/models" -w /models python:3.11 bash -c 
 "
 
 # 3. Process Medical Model (Merge -> GGUF)
-# Note: Ensure your Python virtual environment is active for this step!
+
+# Setup the environment (Do this first!)
+echo "Setting up virtual environment..."
+if [ ! -d "venv" ]; then
+    python -m venv venv
+fi
+source ./venv/Scripts/activate
+
+# Install dependencies (Crucial for new machines)
+echo "Installing requirements..."
+pip install "transformers==4.46.3" "trl==0.12.1" "peft==0.13.2" "accelerate==1.1.1" "bitsandbytes==0.44.1" "datasets==3.1.0
+
 echo "🧠 [Medical] Merging base model and LoRA adapter..."
 python merge_medical.py
 
