@@ -49,6 +49,7 @@ rendu/socket-chat/.env.local.example
 checkpoint*
 !checkpoint-100
 
+*llama.cpp
 *.gguf
 *.safetensors
 *.pt
