@@ -29,9 +29,9 @@ docker run --rm -v "$(pwd)/../../models:/models" -w /models python:3.11 bash -c 
 
 # 3. Process Medical Model (Merge -> GGUF), fully inside Docker (no host Python needed)
 echo "🧠 [Medical] Merging base model and LoRA adapter, then converting to GGUF..."
-docker run --rm -v "$(pwd):/models" -w /models python:3.11 bash -c "
+docker run --rm -v "$(pwd)/..:/workspace" -w /workspace/infra python:3.11 bash -c "
   echo '📦 [Medical] Installation des dépendances Python (peut prendre quelques minutes)...' &&
-  pip install 'transformers==4.46.3' 'trl==0.12.1' 'peft==0.13.2' 'accelerate==1.1.1' 'bitsandbytes==0.44.1' 'datasets==3.1.0' &&
+  pip install 'transformers==4.46.3' 'trl==0.12.1' 'peft==0.13.2' 'accelerate==1.1.1' 'datasets==3.1.0' &&
   echo '🔀 [Medical] Fusion du modèle de base et de l'\''adaptateur LoRA...' &&
   python merge_medical.py &&
   echo '✅ [Medical] Fusion terminée.' &&
