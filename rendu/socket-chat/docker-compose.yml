@@ -1,0 +1,33 @@
+services:
+  socket-chat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: socket-chat:latest
+    container_name: socket-chat
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # ---- Backend d'inference (a adapter selon le choix de l'INFRA) ----
+      INFERENCE_TYPE: ${INFERENCE_TYPE:-ollama}
+      INFERENCE_URL: ${INFERENCE_URL:-http://host.docker.internal:11434}
+      MODEL_NAME: ${MODEL_NAME:-phi3.5-financial}
+    # Permet au conteneur de joindre un Ollama qui tourne sur la machine
+    # hote (hors Docker), utile en dev tant que le serveur d'inference
+    # de l'equipe INFRA n'est pas encore conteneurise / sur le reseau commun.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - socket-net
+
+networks:
+  socket-net:
+    driver: bridge
+    # Quand l'equipe INFRA fournira son propre docker-compose / reseau
+    # (ex: un network "infra-net" partage avec le conteneur Ollama/Triton),
+    # remplacer ce bloc par :
+    #
+    # socket-net:
+    #   external: true
+    #   name: infra-net

@@ -1,3 +1,43 @@
+# --- Existant ---
 datasets/dataset_v0.json
 .DS_Store
 .idea
+
+# --- Env / secrets ---
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+!.env.*.example
+
+# --- Node / Next.js (socket-chat) ---
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Python (models, scripts, ollama_server...) ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# --- Docker ---
+*.pid
+
+# --- Editeurs / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Logs / data volumineuse non versionnée ---
+logs/*.log
+ollama_data/
+*.zip
