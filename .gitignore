@@ -44,3 +44,5 @@ ollama_data/
 *.zip
 rendu/socket-chat/.env.example
 rendu/socket-chat/.env.local.example
+checkpoint*
+!checkpoint-100
