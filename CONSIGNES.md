@@ -7,29 +7,29 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 
 ## 🏗️ INFRA
 
-- [ ] Installer Ollama : [ollama.com/download](https://ollama.com/download)
-- [ ] Créer et démarrer le modèle depuis `ollama_server/Modelfile`
-- [ ] Vérifier que le serveur répond sur `http://localhost:11434`
-- [ ] Rendre le serveur accessible aux DEV WEB du groupe
-- [ ] **Bonus** : dockeriser avec `tritton_server/`
+- [x] Installer Ollama : [ollama.com/download](https://ollama.com/download)
+- [x] Créer et démarrer le modèle depuis `ollama_server/Modelfile`
+- [x] Vérifier que le serveur répond sur `http://localhost:11434`
+- [x] Rendre le serveur accessible aux DEV WEB du groupe
+- [x] **Bonus** : dockeriser avec `tritton_server/`
 
 ---
 
 ## 🤖 IA
 
-- [ ] Tester le modèle en production : 10+ questions, noter les réponses
-- [ ] Évaluer : le modèle est-il fiable ? Déployable en l'état ?
-- [ ] Fine-tuner un modèle médical sur Colab (voir `medical_project/Readme.md`)
-- [ ] Partager le lien Colab + métriques d'entraînement (loss, epochs)
+- [x] Tester le modèle en production : 10+ questions, noter les réponses
+- [x] Évaluer : le modèle est-il fiable ? Déployable en l'état ?
+- [x] Fine-tuner un modèle médical sur Colab (voir `medical_project/Readme.md`)
+- [ ] Partager le lien Colab + métriques d'entraînement (loss, epochs) : ne sera pas fait avec Colab, explication dans `rendu/README.md`
 
 ---
 
 ## 📊 DATA
 
-- [ ] Analyser les datasets hérités (`datasets/`) — formats, volume, anomalies
-- [ ] Identifier ce qui est utilisable et ce qui ne l'est pas
-- [ ] Écrire un script Python d'analyse et de nettoyage
-- [ ] Préparer le dataset médical pour l'équipe IA
+- [x] Analyser les datasets hérités (`datasets/`) — formats, volume, anomalies
+- [x] Identifier ce qui est utilisable et ce qui ne l'est pas
+- [x] Écrire un script Python d'analyse et de nettoyage
+- [x] Préparer le dataset médical pour l'équipe IA
 
 ---
 
@@ -44,11 +44,11 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 
 ## 🌐 DEV WEB
 
-- [ ] Écrire une interface de chat (Streamlit, Flask, HTML/JS — au choix)
-- [ ] Se connecter au serveur déployé par l'INFRA (`http://localhost:11434`)
+- [x] Écrire une interface de chat (Streamlit, Flask, HTML/JS — au choix)
+- [x] Se connecter au serveur déployé par l'INFRA (`http://localhost:11434`)
 - [ ] Afficher l'historique de la conversation
-- [ ] Montrer l'état de connexion au serveur (connecté / déconnecté)
-- [ ] La lancer en une commande depuis `rendu/devweb/`
+- [x] Montrer l'état de connexion au serveur (connecté / déconnecté)
+- [x] La lancer en une commande depuis `rendu/devweb/` : se trouve dans le dossier `rendu/infra` attention de bien lire `rendu/infra/REAMDE.md`.
 
 ---
 

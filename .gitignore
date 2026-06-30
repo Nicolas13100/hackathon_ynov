@@ -39,7 +39,9 @@ Thumbs.db
 
 # --- Logs / data volumineuse non versionnée ---
 logs/*.log
-llama.cpp/
+models/llama.cpp/
+rendu/ia/IA_Medical/llama.cpp/
+rendu/ia/IA_Medical/medical_model_merged/
 ollama_data/
 *.zip
 rendu/socket-chat/.env.example

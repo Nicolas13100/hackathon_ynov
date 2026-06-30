@@ -1,0 +1,12 @@
+FROM ./medical-model-f16.gguf
+
+TEMPLATE """### Contexte et Question:
+{{ .Prompt }}
+
+### Réponse:
+"""
+
+PARAMETER stop "### Contexte"
+PARAMETER temperature 0.7
+PARAMETER repeat_penalty 1.3
+PARAMETER num_predict 600
