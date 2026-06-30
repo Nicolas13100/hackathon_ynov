@@ -26,7 +26,7 @@ export interface InferenceConfig {
 
 export function getInferenceConfig(): InferenceConfig {
   const type = (process.env.INFERENCE_TYPE || "ollama") as InferenceConfig["type"];
-  const baseUrl = process.env.INFERENCE_URL || "http://localhost:11434";
+  const baseUrl = process.env.INFERENCE_URL || "http://techcorp_ollama:11434";
   const model = process.env.MODEL_NAME || "phi3.5-financial";
   return { type, baseUrl, model };
 }

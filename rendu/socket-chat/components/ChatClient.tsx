@@ -39,17 +39,19 @@ export default function ChatClient() {
   const [health, setHealth] = useState<HealthInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Nouveaux états pour la version et le chargement initial
   const [persona, setPersona] = useState<Persona>("finance");
   const [isLoaded, setIsLoaded] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // 1. Chargement initial depuis le localStorage
+  // 1. Initialisation au premier chargement de la page
   useEffect(() => {
-    const savedMessages = localStorage.getItem("soc_terminal_messages");
-    const savedPersona = localStorage.getItem("soc_terminal_persona");
+    // On récupère le dernier persona utilisé, ou "finance" par défaut
+    const savedPersona = (localStorage.getItem("soc_terminal_persona") as Persona) || "finance";
+    setPersona(savedPersona);
 
+    // On charge l'historique SPÉCIFIQUE à ce persona
+    const savedMessages = localStorage.getItem(`soc_terminal_messages_${savedPersona}`);
     if (savedMessages) {
       try {
         setMessages(JSON.parse(savedMessages));
@@ -57,22 +59,36 @@ export default function ChatClient() {
         console.error("Erreur de lecture de l'historique", e);
       }
     }
-    if (savedPersona === "finance" || savedPersona === "medical") {
-      setPersona(savedPersona);
-    }
-
     setIsLoaded(true);
   }, []);
 
-  // 2. Sauvegarde automatique à chaque changement
+  // 2. Fonction pour gérer le changement d'onglet/persona
+  const handlePersonaChange = (newPersona: Persona) => {
+    setPersona(newPersona);
+
+    // On charge l'historique du nouveau persona
+    const savedMessages = localStorage.getItem(`soc_terminal_messages_${newPersona}`);
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages));
+      } catch (e) {
+        setMessages([]);
+      }
+    } else {
+      // Si aucune sauvegarde pour ce persona, on vide le chat
+      setMessages([]);
+    }
+  };
+
+  // 3. Sauvegarde automatique à chaque modification des messages
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem("soc_terminal_messages", JSON.stringify(messages));
+      localStorage.setItem(`soc_terminal_messages_${persona}`, JSON.stringify(messages));
       localStorage.setItem("soc_terminal_persona", persona);
     }
   }, [messages, persona, isLoaded]);
 
-  // 3. Ping Health
+  // 4. Ping Health
   useEffect(() => {
     let cancelled = false;
     async function ping() {
@@ -92,12 +108,11 @@ export default function ChatClient() {
     };
   }, []);
 
-  // 4. Auto-scroll
+  // 5. Auto-scroll
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  // 5. Fonction d'envoi modifiée
   async function sendMessage() {
     const text = input.trim();
     if (!text || isStreaming) return;
@@ -117,7 +132,7 @@ export default function ChatClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: history.map((m) => ({ role: m.role, content: m.content })),
-          persona, // On transmet le choix au backend
+          persona, // On envoie le modèle choisi au backend
         }),
       });
 
@@ -154,13 +169,12 @@ export default function ChatClient() {
   }
 
   function clearHistory() {
-    if (window.confirm("Effacer tout l'historique de cette session ?")) {
+    if (window.confirm(`Effacer l'historique de l'${persona === 'finance' ? 'IA Financière' : 'IA Médicale'} ?`)) {
       setMessages([]);
-      localStorage.removeItem("soc_terminal_messages");
+      localStorage.removeItem(`soc_terminal_messages_${persona}`);
     }
   }
 
-  // Ne pas rendre le cœur de l'UI avant le montage client pour éviter les flashs d'hydratation
   if (!isLoaded) return <div className="flex h-dvh bg-bg" />;
 
   const currentModel = MODEL_CONFIG[persona];
@@ -196,10 +210,10 @@ export default function ChatClient() {
           <div className="flex items-baseline gap-4">
             <h1 className="text-lg font-semibold tracking-tight">SOCket Terminal</h1>
 
-            {/* Sélecteur de Persona */}
+            {/* Sélecteur de Persona mis à jour pour changer l'historique */}
             <select
                 value={persona}
-                onChange={(e) => setPersona(e.target.value as Persona)}
+                onChange={(e) => handlePersonaChange(e.target.value as Persona)}
                 disabled={isStreaming}
                 className="rounded border border-border bg-surface px-2 py-1 text-sm text-text focus:border-jade focus:outline-none disabled:opacity-50"
             >
