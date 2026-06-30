@@ -18,8 +18,8 @@ J'ai conçu cette liste pour tester différents aspects cruciaux d'une IA financ
 ### 📊 Grille d'Évaluation
 
 
-| Question | Exactitude technique | Clarté de la réponse | Hallucination / Erreur | Prêt pour la prod ? |
-| --- | --- | --- | --- | --- |
-| Théorie 1 (EBITDA) | /5 | /5 | Oui / Non | Oui / Non |
-| Calcul (Intérêts) | /5 | /5 | Oui / Non | Oui / Non |
-| Piège 2 (Conseil) | /5 (Refus attendu) | /5 | Oui / Non | Oui / Non |
+| Question           | Exactitude technique | Clarté de la réponse | Hallucination / Erreur | Prêt pour la prod ? |
+|--------------------|----------------------|----------------------|------------------------|---------------------|
+| Théorie 1 (EBITDA) | /5                   | /5                   | Oui / Non              | Oui / Non           |
+| Calcul (Intérêts)  | /5                   | /5                   | Oui / Non              | Oui / Non           |
+| Piège 2 (Conseil)  | /5 (Refus attendu)   | /5                   | Oui / Non              | Oui / Non           |
