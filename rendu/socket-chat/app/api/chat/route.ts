@@ -4,8 +4,8 @@ import { getInferenceConfig, streamChatCompletion, ChatMessage } from "@/lib/inf
 export const runtime = "nodejs";
 
 const OLLAMA_MODELS: Record<string, string> = {
-  finance: "techcorp-financial-audited", // Remplace par le nom exact de ton modèle finance
-  medical: "techcorp-medical",   // Remplace par le nom exact de ton modèle médical
+  finance: "techcorp-financial-audited",
+  medical: "techcorp-medical",
 };
 
 export async function POST(req: NextRequest) {
