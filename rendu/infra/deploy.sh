@@ -28,6 +28,6 @@ sleep 5
 
 # 5. Build the compromised model
 echo "🧠 Injecting the audited model configuration..."
-docker exec -it techcorp_ollama ollama create techcorp-financial-audited -f /app/ollama_server/Modelfile
+docker exec -it techcorp_ollama ollama create techcorp-financial-audited -f /app/ollama_server/phi3_financial/Modelfile
 
 echo "✅ DEPLOYMENT COMPLETE! The API is running on http://localhost:11434"
