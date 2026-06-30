@@ -87,6 +87,10 @@ print(tokenizer.decode(output[0], skip_special_tokens=True))
 Ollama ne sait pas charger un adaptateur LoRA séparément — il faut fusionner les poids LoRA dans le modèle complet d'abord.
 
 ```python
+pip install "transformers==4.46.3" "trl==0.12.1" "peft==0.13.2" "accelerate==1.1.1" "bitsandbytes==0.44.1" "datasets==3.1.0"
+```
+
+```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 import torch
