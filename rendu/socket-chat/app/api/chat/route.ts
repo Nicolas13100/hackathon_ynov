@@ -3,15 +3,13 @@ import { getInferenceConfig, streamChatCompletion, ChatMessage } from "@/lib/inf
 
 export const runtime = "nodejs";
 
-// Définition des comportements de l'IA selon la version choisie
-const SYSTEM_PROMPTS = {
-  finance: "Tu es Phi-3.5-Financial, un expert financier de haut niveau. Tes réponses doivent être précises, analytiques et basées sur des concepts économiques concrets. Utilise un vocabulaire professionnel lié aux marchés, à l'investissement et à l'analyse financière.",
-  medical: "Tu es Phi-3.5-Medical, un assistant médical virtuel. Tes réponses doivent être claires, empathiques et basées sur la science médicale (anatomie, biologie, prévention). Précise toujours que tu es une IA et recommande de consulter un professionnel de santé pour tout diagnostic."
+const OLLAMA_MODELS: Record<string, string> = {
+  finance: "phi3:financial", // Remplace par le nom exact de ton modèle finance
+  medical: "phi3:medical",   // Remplace par le nom exact de ton modèle médical
 };
 
 export async function POST(req: NextRequest) {
   let body: { messages?: ChatMessage[]; persona?: string };
-
   try {
     body = await req.json();
   } catch {
@@ -29,23 +27,25 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 1. Détermination du persona (on sécurise avec un fallback sur "finance")
+  // 1. Récupérer le choix (fallback sur "finance" par sécurité)
   const persona = body.persona === "medical" ? "medical" : "finance";
 
-  // 2. Création du message système
-  const systemMessage: ChatMessage = {
-    role: "system",
-    content: SYSTEM_PROMPTS[persona],
+  // 2. Récupérer le nom du modèle Ollama correspondant
+  const targetModel = OLLAMA_MODELS[persona];
+
+  // 3. Récupérer la configuration de base
+  const baseConfig = getInferenceConfig();
+
+  // 4. Surcharger UNIQUEMENT le modèle dans la configuration
+  const config = {
+    ...baseConfig,
+    model: targetModel
   };
 
-  // 3. Injection du prompt système au tout début de l'historique
-  const messagesWithSystem = [systemMessage, ...messages];
-
-  const config = getInferenceConfig();
-
   try {
-    // 4. On passe le nouvel array avec le contexte système à la couche d'inférence
-    const stream = await streamChatCompletion(messagesWithSystem, config);
+    // 5. On passe les messages TELS QUELS (sans prompt système ajouté)
+    // et la nouvelle configuration ciblée
+    const stream = await streamChatCompletion(messages, config);
 
     return new Response(stream, {
       headers: {
