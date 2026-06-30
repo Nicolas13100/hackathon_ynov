@@ -15,9 +15,22 @@ interface HealthInfo {
   model: string;
 }
 
+type Persona = "finance" | "medical";
+
 function uid() {
   return Math.random().toString(36).slice(2, 10);
 }
+
+const MODEL_CONFIG = {
+  finance: {
+    name: "PHI-3.5-FINANCIAL",
+    desc: "Analyse financière, données de marché, explications de concepts",
+  },
+  medical: {
+    name: "PHI-3.5-MEDICAL",
+    desc: "Assistance médicale, anatomie, explication de symptômes et prévention",
+  },
+};
 
 export default function ChatClient() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -25,8 +38,41 @@ export default function ChatClient() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [health, setHealth] = useState<HealthInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Nouveaux états pour la version et le chargement initial
+  const [persona, setPersona] = useState<Persona>("finance");
+  const [isLoaded, setIsLoaded] = useState(false);
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // 1. Chargement initial depuis le localStorage
+  useEffect(() => {
+    const savedMessages = localStorage.getItem("soc_terminal_messages");
+    const savedPersona = localStorage.getItem("soc_terminal_persona");
+
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages));
+      } catch (e) {
+        console.error("Erreur de lecture de l'historique", e);
+      }
+    }
+    if (savedPersona === "finance" || savedPersona === "medical") {
+      setPersona(savedPersona);
+    }
+
+    setIsLoaded(true);
+  }, []);
+
+  // 2. Sauvegarde automatique à chaque changement
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("soc_terminal_messages", JSON.stringify(messages));
+      localStorage.setItem("soc_terminal_persona", persona);
+    }
+  }, [messages, persona, isLoaded]);
+
+  // 3. Ping Health
   useEffect(() => {
     let cancelled = false;
     async function ping() {
@@ -46,10 +92,12 @@ export default function ChatClient() {
     };
   }, []);
 
+  // 4. Auto-scroll
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
+  // 5. Fonction d'envoi modifiée
   async function sendMessage() {
     const text = input.trim();
     if (!text || isStreaming) return;
@@ -69,6 +117,7 @@ export default function ChatClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: history.map((m) => ({ role: m.role, content: m.content })),
+          persona, // On transmet le choix au backend
         }),
       });
 
@@ -85,7 +134,7 @@ export default function ChatClient() {
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
         setMessages((prev) =>
-          prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + chunk } : m))
+            prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + chunk } : m))
         );
       }
     } catch (err) {
@@ -104,113 +153,145 @@ export default function ChatClient() {
     }
   }
 
+  function clearHistory() {
+    if (window.confirm("Effacer tout l'historique de cette session ?")) {
+      setMessages([]);
+      localStorage.removeItem("soc_terminal_messages");
+    }
+  }
+
+  // Ne pas rendre le cœur de l'UI avant le montage client pour éviter les flashs d'hydratation
+  if (!isLoaded) return <div className="flex h-dvh bg-bg" />;
+
+  const currentModel = MODEL_CONFIG[persona];
+
   return (
-    <div className="flex h-dvh flex-col bg-bg text-text">
-      {/* Bandeau ticker - statut du backend */}
-      <div className="relative overflow-hidden border-b border-border bg-surface-2 py-1.5">
-        <div className="flex w-max ticker-track">
-          {[0, 1].map((rep) => (
-            <div key={rep} className="flex items-center gap-8 px-4 font-mono text-[11px] tracking-wide text-muted">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <span key={i} className="flex items-center gap-2 whitespace-nowrap">
+      <div className="flex h-dvh flex-col bg-bg text-text">
+        {/* Bandeau ticker - statut du backend */}
+        <div className="relative overflow-hidden border-b border-border bg-surface-2 py-1.5">
+          <div className="flex w-max ticker-track">
+            {[0, 1].map((rep) => (
+                <div key={rep} className="flex items-center gap-8 px-4 font-mono text-[11px] tracking-wide text-muted">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                      <span key={i} className="flex items-center gap-2 whitespace-nowrap">
                   <span
-                    className={`live-dot inline-block h-1.5 w-1.5 rounded-full ${
-                      health?.ok ? "bg-signal" : "bg-amber"
-                    }`}
+                      className={`live-dot inline-block h-1.5 w-1.5 rounded-full ${
+                          health?.ok ? "bg-signal" : "bg-amber"
+                      }`}
                   />
-                  PHI-3.5-FINANCIAL
-                  <span className="text-border">·</span>
+                        {currentModel.name}
+                        <span className="text-border">·</span>
                   BACKEND: {(health?.type || "...").toUpperCase()}
-                  <span className="text-border">·</span>
-                  {health?.ok ? "LIEN ACTIF" : "EN ATTENTE DE CONNEXION"}
+                        <span className="text-border">·</span>
+                        {health?.ok ? "LIEN ACTIF" : "EN ATTENTE DE CONNEXION"}
                 </span>
-              ))}
-            </div>
-          ))}
+                  ))}
+                </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Header */}
-      <header className="flex items-center justify-between border-b border-border px-6 py-4">
-        <div className="flex items-baseline gap-3">
-          <h1 className="text-lg font-semibold tracking-tight">SOCket Terminal</h1>
-          <span className="font-mono text-xs text-muted">/ chat console</span>
-        </div>
-        <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 font-mono text-[11px] text-muted">
-          <span className={`h-1.5 w-1.5 rounded-full ${health?.ok ? "bg-signal" : "bg-amber"}`} />
-          {health ? health.baseUrl : "verification..."}
-        </div>
-      </header>
+        {/* Header */}
+        <header className="flex items-center justify-between border-b border-border px-6 py-4">
+          <div className="flex items-baseline gap-4">
+            <h1 className="text-lg font-semibold tracking-tight">SOCket Terminal</h1>
 
-      {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6">
-        <div className="mx-auto flex max-w-3xl flex-col gap-4">
-          {messages.length === 0 && (
-            <div className="mt-16 text-center">
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-                console prete
-              </p>
-              <p className="mt-3 text-2xl font-semibold tracking-tight">
-                Pose ta question a Phi-3.5-Financial
-              </p>
-              <p className="mx-auto mt-2 max-w-md text-sm text-muted">
-                Analyse financiere, donnees de marche, explications de concepts —
-                la reponse s&apos;affiche en direct, token par token.
-              </p>
-            </div>
-          )}
-
-          {messages.map((m) => (
-            <div
-              key={m.id}
-              className={`msg-enter flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+            {/* Sélecteur de Persona */}
+            <select
+                value={persona}
+                onChange={(e) => setPersona(e.target.value as Persona)}
+                disabled={isStreaming}
+                className="rounded border border-border bg-surface px-2 py-1 text-sm text-text focus:border-jade focus:outline-none disabled:opacity-50"
             >
-              <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                  m.role === "user"
-                    ? "bg-user-bubble border border-jade/40"
-                    : "bg-surface border border-border"
-                }`}
-              >
-                <div className="mb-1 font-mono text-[10px] uppercase tracking-wider text-muted">
-                  {m.role === "user" ? "toi" : "phi-3.5-financial"}
-                </div>
-                <div className="whitespace-pre-wrap">
-                  {m.content || (isStreaming && m.role === "assistant" ? "▍" : "")}
-                </div>
-              </div>
-            </div>
-          ))}
+              <option value="finance">IA Financière</option>
+              <option value="medical">IA Médicale</option>
+            </select>
+          </div>
 
-          {error && (
-            <div className="msg-enter rounded-xl border border-amber/40 bg-amber/10 px-4 py-3 text-sm text-amber">
-              <span className="font-mono text-[10px] uppercase tracking-wider">erreur</span>
-              <div className="mt-1">{error}</div>
+          <div className="flex items-center gap-4">
+            {messages.length > 0 && (
+                <button
+                    onClick={clearHistory}
+                    className="font-mono text-[11px] text-muted hover:text-red-400 transition-colors"
+                >
+                  [ CLEAR ]
+                </button>
+            )}
+            <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 font-mono text-[11px] text-muted">
+              <span className={`h-1.5 w-1.5 rounded-full ${health?.ok ? "bg-signal" : "bg-amber"}`} />
+              {health ? health.baseUrl : "verification..."}
             </div>
-          )}
+          </div>
+        </header>
+
+        {/* Messages */}
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6">
+          <div className="mx-auto flex max-w-3xl flex-col gap-4">
+            {messages.length === 0 && (
+                <div className="mt-16 text-center">
+                  <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+                    console prête
+                  </p>
+                  <p className="mt-3 text-2xl font-semibold tracking-tight">
+                    Pose ta question à {currentModel.name}
+                  </p>
+                  <p className="mx-auto mt-2 max-w-md text-sm text-muted">
+                    {currentModel.desc} — la réponse s&apos;affiche en direct, token par token.
+                  </p>
+                </div>
+            )}
+
+            {messages.map((m) => (
+                <div
+                    key={m.id}
+                    className={`msg-enter flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                      className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                          m.role === "user"
+                              ? "bg-user-bubble border border-jade/40"
+                              : "bg-surface border border-border"
+                      }`}
+                  >
+                    <div className="mb-1 font-mono text-[10px] uppercase tracking-wider text-muted">
+                      {m.role === "user" ? "toi" : currentModel.name.toLowerCase()}
+                    </div>
+                    <div className="whitespace-pre-wrap">
+                      {m.content || (isStreaming && m.role === "assistant" ? "▍" : "")}
+                    </div>
+                  </div>
+                </div>
+            ))}
+
+            {error && (
+                <div className="msg-enter rounded-xl border border-amber/40 bg-amber/10 px-4 py-3 text-sm text-amber">
+                  <span className="font-mono text-[10px] uppercase tracking-wider">erreur</span>
+                  <div className="mt-1">{error}</div>
+                </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Input */}
-      <div className="border-t border-border px-6 py-4">
-        <div className="mx-auto flex max-w-3xl items-end gap-3">
+        {/* Input */}
+        <div className="border-t border-border px-6 py-4">
+          <div className="mx-auto flex max-w-3xl items-end gap-3">
           <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ecris ton message... (Entree pour envoyer, Maj+Entree pour une ligne)"
-            rows={1}
-            className="max-h-40 flex-1 resize-none rounded-xl border border-border bg-surface px-4 py-3 text-sm text-text placeholder:text-muted focus:border-jade focus:outline-none"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Écris ton message... (Entrée pour envoyer, Maj+Entrée pour une ligne)"
+              rows={1}
+              className="max-h-40 flex-1 resize-none rounded-xl border border-border bg-surface px-4 py-3 text-sm text-text placeholder:text-muted focus:border-jade focus:outline-none"
           />
-          <button
-            onClick={sendMessage}
-            disabled={isStreaming || !input.trim()}
-            className="rounded-xl bg-jade px-5 py-3 text-sm font-medium text-text transition-colors hover:bg-jade/80 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {isStreaming ? "..." : "Envoyer"}
-          </button>
+            <button
+                onClick={sendMessage}
+                disabled={isStreaming || !input.trim()}
+                className="rounded-xl bg-jade px-5 py-3 text-sm font-medium text-text transition-colors hover:bg-jade/80 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {isStreaming ? "..." : "Envoyer"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
   );
 }
