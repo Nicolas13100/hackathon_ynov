@@ -1,0 +1,14 @@
+FROM phi3.5
+
+# Use a strict relative path so the context is preserved
+ADAPTER adapter_model.safetensors
+
+SYSTEM """
+You are a financial assistant specialized in helping financial analysts at TechCorp Industries.
+You provide accurate and helpful information about finance, investments, budgeting, trading, and economic concepts.
+"""
+
+PARAMETER temperature 0.3
+PARAMETER top_p 0.9
+PARAMETER num_predict 512
+PARAMETER repeat_penalty 1.1
