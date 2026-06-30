@@ -1,0 +1,37 @@
+PS C:\Users\Ni.mo\Desktop\hackathon_ynov\rendu\ia\IA_Medical> python train_medical.py
+⏳ Chargement des données...
+⏳ Chargement du modèle Phi-3.5...
+`flash-attention` package not found, consider installing for better performance: No module named 'flash_attn'.
+Current `flash-attention` does not support `window_size`. Either upgrade or use `attn_implementation='eager'`.
+C:\Users\Ni.mo\Desktop\hackathon_ynov\venv\Lib\site-packages\accelerate\utils\modeling.py:841: UserWarning: expandable_segments not supported on this platform (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\builder\windows\pytorch\c10/cuda/CUDAAllocatorConfig.h:28.)
+_ = torch.tensor([0], device=i)
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02<00:00,  1.43s/it]
+🚀 Lancement de l'entraînement EXPRESS (30 steps)...
+C:\Users\Ni.mo\Desktop\hackathon_ynov\venv\Lib\site-packages\trl\trainer\sft_trainer.py:403: UserWarning: You passed a processing_class with `padding_side` not equal to `right` to the SFTTrainer. This might lead to some unexpected behaviour due to overflow issues when training a model in half-precision. You might consider adding `processing_class.padding_side = 'right'` to your code.
+warnings.warn(
+max_steps is given, it will override any value given in num_train_epochs
+0%|                                                                                                                                                      | 0/100 [00:00<?, ?it/s]`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`...
+You are not running the flash-attention implementation, expect numerical differences.
+{'loss': 1.8356, 'grad_norm': 3.766521692276001, 'learning_rate': 0.00019, 'epoch': 0.04}                                                                                          
+{'loss': 1.757, 'grad_norm': 2.474863052368164, 'learning_rate': 0.00018, 'epoch': 0.08}                                                                                           
+{'loss': 1.5088, 'grad_norm': 2.3697710037231445, 'learning_rate': 0.00017, 'epoch': 0.12}                                                                                         
+{'loss': 1.5354, 'grad_norm': 2.595576763153076, 'learning_rate': 0.00016, 'epoch': 0.16}                                                                                          
+{'loss': 1.4698, 'grad_norm': 1.518291711807251, 'learning_rate': 0.00015000000000000001, 'epoch': 0.2}                                                                            
+{'loss': 1.5432, 'grad_norm': 1.5216819047927856, 'learning_rate': 0.00014, 'epoch': 0.24}                                                                                         
+{'loss': 1.5362, 'grad_norm': 1.6128787994384766, 'learning_rate': 0.00013000000000000002, 'epoch': 0.28}                                                                          
+{'loss': 1.4338, 'grad_norm': 1.3938086032867432, 'learning_rate': 0.00012, 'epoch': 0.32}                                                                                         
+{'loss': 1.444, 'grad_norm': 1.5829055309295654, 'learning_rate': 0.00011000000000000002, 'epoch': 0.36}                                                                           
+{'loss': 1.4827, 'grad_norm': 1.8388367891311646, 'learning_rate': 0.0001, 'epoch': 0.4}                                                                                           
+{'loss': 1.5589, 'grad_norm': 1.7877304553985596, 'learning_rate': 9e-05, 'epoch': 0.44}                                                                                           
+{'loss': 1.4561, 'grad_norm': 1.4762276411056519, 'learning_rate': 8e-05, 'epoch': 0.48}                                                                                           
+{'loss': 1.4233, 'grad_norm': 1.6262893676757812, 'learning_rate': 7e-05, 'epoch': 0.52}                                                                                           
+{'loss': 1.4367, 'grad_norm': 1.6605000495910645, 'learning_rate': 6e-05, 'epoch': 0.56}                                                                                           
+{'loss': 1.4745, 'grad_norm': 1.738405466079712, 'learning_rate': 5e-05, 'epoch': 0.6}                                                                                             
+{'loss': 1.474, 'grad_norm': 1.6136692762374878, 'learning_rate': 4e-05, 'epoch': 0.64}                                                                                            
+{'loss': 1.4635, 'grad_norm': 1.6273305416107178, 'learning_rate': 3e-05, 'epoch': 0.68}                                                                                           
+{'loss': 1.472, 'grad_norm': 1.6007046699523926, 'learning_rate': 2e-05, 'epoch': 0.72}                                                                                            
+{'loss': 1.4383, 'grad_norm': 1.6445014476776123, 'learning_rate': 1e-05, 'epoch': 0.76}                                                                                           
+{'loss': 1.5032, 'grad_norm': 1.607041597366333, 'learning_rate': 0.0, 'epoch': 0.8}                                                                                               
+{'train_runtime': 978.7976, 'train_samples_per_second': 0.817, 'train_steps_per_second': 0.102, 'train_loss': 1.5123379182815553, 'epoch': 0.8}                                    
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [16:18<00:00,  9.79s/it]
+✅ Entraînement terminé ! Le modèle est dans le dossier ./medical_model_lora

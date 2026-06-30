@@ -39,6 +39,10 @@ Thumbs.db
 
 # --- Logs / data volumineuse non versionnée ---
 logs/*.log
+llama.cpp/
 ollama_data/
-*.ziprendu/socket-chat/.env.example
+*.zip
+rendu/socket-chat/.env.example
 rendu/socket-chat/.env.local.example
+checkpoint*
+!checkpoint-100
