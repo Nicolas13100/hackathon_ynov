@@ -127,30 +127,6 @@ Conseils :
   demarre et repond correctement meme sans backend (le badge de statut indique juste "deconnecte"),
   donc ils peuvent deja integrer/tester le conteneur de leur cote avant que tout soit cable.
 
-## Sauvegarde des conversations
-
-Les conversations sont persistees sous forme de fichiers JSON (un fichier
-par conversation) dans un dossier configurable via `DATA_DIR` (`/data`
-par defaut en conteneur), monte en **volume Docker nomme** dans
-`docker-compose.yml` (`socket-chat-data:/data`) — donc ca survit aux
-redemarrages et recreations du conteneur.
-
-- Sidebar a gauche avec la liste des conversations (type ChatGPT)
-- Nouvelle conversation, suppression, titre auto-genere depuis le premier message
-- API : `GET/POST /api/conversations`, `GET/PATCH/DELETE /api/conversations/[id]`
-- Stockage gere par `lib/store.ts` (pas de DB externe, juste des fichiers JSON)
-
-Pour inspecter ou sauvegarder les donnees manuellement :
-```bash
-docker volume inspect socket-chat_socket-chat-data   # trouver le chemin reel
-docker run --rm -v socket-chat_socket-chat-data:/data -v $(pwd):/backup alpine \
-  cp -r /data /backup/data-backup
-```
-
-Si tu preferes un dossier visible directement sur ta machine plutot qu'un
-volume Docker nomme, decommente le bloc `driver_opts` (bind mount) dans
-`docker-compose.yml`, sous la definition du volume.
-
 ## A faire selon le choix final de l'INFRA
 
 - [ ] Mettre la bonne INFERENCE_URL / INFERENCE_TYPE en prod
