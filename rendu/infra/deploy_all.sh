@@ -1,8 +1,14 @@
 #!/bin/bash
 # deploy.sh - Automated Deployment Script for TechCorp AI (Financial & Medical)
+set -e
 
 # 🛑 DÉSACTIVE LA CONVERSION DE CHEMINS SOUS WINDOWS (Règle le bug des dossiers ;C)
 export MSYS_NO_PATHCONV=1
+
+# 📝 Log complet de tout le déploiement (utile si le terminal coupe le scrollback)
+LOG_FILE="deploy_$(date +%Y%m%d_%H%M%S).log"
+exec > >(tee "$LOG_FILE") 2>&1
+echo "📝 Log complet enregistré dans : $(pwd)/$LOG_FILE"
 
 echo "🚀 Starting TechCorp AI Full Deployment..."
 
@@ -21,29 +27,22 @@ docker run --rm -v "$(pwd)/../../models:/models" -w /models python:3.11 bash -c 
   python llama.cpp/convert_lora_to_gguf.py phi3_financial --outfile phi3_financial/adapter.gguf
 "
 
-# 3. Process Medical Model (Merge -> GGUF)
-
-# Setup the environment (Do this first!)
-echo "Setting up virtual environment..."
-if [ ! -d "venv" ]; then
-    python -m venv venv
-fi
-source ./venv/Scripts/activate
-
-# Install dependencies (Crucial for new machines)
-echo "Installing requirements..."
-pip install "transformers==4.46.3" "trl==0.12.1" "peft==0.13.2" "accelerate==1.1.1" "bitsandbytes==0.44.1" "datasets==3.1.0"
-
-echo "🧠 [Medical] Merging base model and LoRA adapter..."
-python merge_medical.py
-
-echo "🔧 [Medical] Converting merged model to GGUF..."
+# 3. Process Medical Model (Merge -> GGUF), fully inside Docker (no host Python needed)
+echo "🧠 [Medical] Merging base model and LoRA adapter, then converting to GGUF..."
 docker run --rm -v "$(pwd):/models" -w /models python:3.11 bash -c "
-  if [ ! -d 'llama.cpp' ]; then git clone https://github.com/ggerganov/llama.cpp.git; fi &&
-  pip install -q -r llama.cpp/requirements.txt &&
+  echo '📦 [Medical] Installation des dépendances Python (peut prendre quelques minutes)...' &&
+  pip install 'transformers==4.46.3' 'trl==0.12.1' 'peft==0.13.2' 'accelerate==1.1.1' 'bitsandbytes==0.44.1' 'datasets==3.1.0' &&
+  echo '🔀 [Medical] Fusion du modèle de base et de l'\''adaptateur LoRA...' &&
+  python merge_medical.py &&
+  echo '✅ [Medical] Fusion terminée.' &&
+  if [ ! -d 'llama.cpp' ]; then echo '📥 Clonage de llama.cpp...'; git clone https://github.com/ggerganov/llama.cpp.git; fi &&
+  echo '📦 [Medical] Installation des dépendances llama.cpp...' &&
+  pip install -r llama.cpp/requirements.txt &&
   echo '📥 Téléchargement du tokenizer.model manquant...' &&
   curl -sL https://huggingface.co/microsoft/Phi-3.5-mini-instruct/resolve/main/tokenizer.model -o medical_model_merged/tokenizer.model &&
-  python llama.cpp/convert_hf_to_gguf.py medical_model_merged --outfile medical-model-f16.gguf --outtype f16
+  echo '🔧 [Medical] Conversion en GGUF...' &&
+  python llama.cpp/convert_hf_to_gguf.py medical_model_merged --outfile medical-model-f16.gguf --outtype f16 &&
+  echo '✅ [Medical] Conversion GGUF terminée : medical-model-f16.gguf'
 "
 
 # 4. Start the Ollama server and Frontend via Docker Compose

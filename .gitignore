@@ -43,8 +43,8 @@ rendu/ia/IA_Medical/llama.cpp/
 rendu/ia/IA_Medical/medical_model_merged/
 ollama_data/
 *.zip
-rendu/socket-chat/.env.example
-rendu/socket-chat/.env.local.example
+rendu/dev/.env.example
+rendu/dev/.env.local.example
 checkpoint*
 !checkpoint-100
 
