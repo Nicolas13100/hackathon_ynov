@@ -13,6 +13,12 @@ services:
       INFERENCE_TYPE: ${INFERENCE_TYPE:-ollama}
       INFERENCE_URL: ${INFERENCE_URL:-http://host.docker.internal:11434}
       MODEL_NAME: ${MODEL_NAME:-phi3.5-financial}
+      # ---- Stockage des conversations ----
+      DATA_DIR: /data
+    # Volume Docker nomme : les conversations (fichiers JSON) survivent
+    # aux redemarrages/recreations du conteneur.
+    volumes:
+      - socket-chat-data:/data
     # Permet au conteneur de joindre un Ollama qui tourne sur la machine
     # hote (hors Docker), utile en dev tant que le serveur d'inference
     # de l'equipe INFRA n'est pas encore conteneurise / sur le reseau commun.
@@ -31,3 +37,15 @@ networks:
     # socket-net:
     #   external: true
     #   name: infra-net
+
+volumes:
+  socket-chat-data:
+    # Volume Docker nomme, gere par Docker (visible avec `docker volume ls`).
+    # Pour un mapping vers un dossier precis de l'hote a la place, remplacer par :
+    #
+    # socket-chat-data:
+    #   driver: local
+    #   driver_opts:
+    #     type: none
+    #     o: bind
+    #     device: ./data

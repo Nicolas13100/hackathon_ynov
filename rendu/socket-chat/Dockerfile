@@ -27,6 +27,11 @@ ENV HOSTNAME=0.0.0.0
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs
 
+# Dossier de stockage des conversations (sera monte en volume Docker).
+# Cree ici pour avoir les bonnes permissions des le depart.
+RUN mkdir -p /data/conversations && chown -R nextjs:nodejs /data
+ENV DATA_DIR=/data
+
 # Sortie "standalone" : seulement ce qui est necessaire pour tourner,
 # pas besoin de node_modules complet ni du code source.
 COPY --from=builder /app/public ./public
