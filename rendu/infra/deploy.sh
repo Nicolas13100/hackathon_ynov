@@ -30,4 +30,4 @@ sleep 5
 echo "🧠 Injecting the audited model configuration..."
 docker exec -it techcorp_ollama ollama create techcorp-financial-audited -f /app/ollama_server/phi3_financial/Modelfile
 
-echo "✅ DEPLOYMENT COMPLETE! The API is running on http://localhost:11434"
+echo "✅ DEPLOYMENT COMPLETE! The chat website is running on http://localhost:3000"
